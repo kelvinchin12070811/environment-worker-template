@@ -1,0 +1,42 @@
+#! /usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'fileutils'
+
+SYMLINK_PATH = [
+  { src: 'Better Discord\\Plugins', dest: 'AppData\\Roaming\\betterdiscord\\plugins' },
+  { src: 'Better Discord\\Themes', dest: 'AppData\\Roaming\\betterdiscord\\themes' },
+  { src: 'Git Configs\\Main Config.gitconfig', dest: '.gitconfig' },
+  { src: 'Vim\\Default\\.vimrc', dest: '.vimrc' },
+  { src: 'Vim\\Default\\.vimrc', dest: '.ideavimrc' }
+].freeze
+
+puts 'Enter Dropbox folder path: '
+print '> '
+dropbox_path = gets.chop
+
+puts 'Enter user profile path: '
+print '> '
+user_profile_path = gets.chop
+
+unless Dir.exist?(dropbox_path) || Dir.exist?(user_profile_path)
+  puts 'Directroies entered not exists, check the validity first.'
+  puts "Dropbox dir: #{dropbox_path}"
+  puts "User profile dir: #{user_profile_path}"
+  exit
+end
+
+puts ''
+puts "Installation plan:\nDropbox dir: #{dropbox_path}\nConfig dir: #{user_profile_path}"
+print 'Contine? (y/N): '
+continue_setup = gets.chop
+
+exit unless continue_setup.match(/^y$/i)
+
+puts 'Linking configs...'
+SYMLINK_PATH.each_with_index do |path, index|
+  puts "#{index + 1} of #{SYMLINK_PATH.length} Linking #{path[:dest]}"
+  FileUtils.ln_s("#{dropbox_path}\\#{path[:src]}", "#{user_profile_path}\\#{path[:dest]}")
+rescue StandardError
+  next
+end
